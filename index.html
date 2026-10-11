@@ -10,15 +10,15 @@
     index.html?layout=vertical     … 縦 (基準 1080x1920)
     &transparent=1                 … 背景を透過（カードだけ表示）
   ブロックの模様とアイテムの絵は、このファイル内のスクリプトで描いた自作ドット絵。
-  ギフトの絵は gifts/ の本物のTikTokギフト画像。フォントは fonts/DotGothic16 (SIL OFL)。
+  ギフトの絵は gifts/ の本物のTikTokギフト画像。フォントは fonts/MPLUSRounded1c-Bold (SIL OFL)。
 -->
 <style>
-@font-face{font-family:Dot;src:url('fonts/DotGothic16.ttf') format('truetype');font-display:block}
+@font-face{font-family:Rnd;src:url('fonts/MPLUSRounded1c-Bold.ttf') format('truetype');font-weight:400 900;font-display:block}
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{width:100%;height:100%;overflow:hidden;background:#15171c}
 body.transparent,html.transparent{background:transparent}
 #stage{position:absolute;left:0;top:0;transform-origin:0 0;display:flex;flex-direction:column;
-  font-family:Dot,'DotGothic16','Noto Sans CJK JP','Yu Gothic','Meiryo',sans-serif;color:#fff;
+  font-family:Rnd,'Rounded Mplus 1c','Noto Sans CJK JP','Yu Gothic','Meiryo',sans-serif;color:#fff;
   image-rendering:pixelated;padding:36px 40px 32px}
 #stage.h{width:1920px;height:1080px}
 #stage.v{width:1080px;height:1920px;padding:40px 36px 36px}
@@ -30,7 +30,7 @@ body.transparent,html.transparent{background:transparent}
   box-shadow:inset 4px 4px 0 rgba(255,255,255,.16),inset -4px -4px 0 rgba(0,0,0,.4)}
 .hd::before{content:"";position:absolute;left:0;right:0;top:0;height:24px;background-size:64px 24px;
   background-image:var(--grass);border-bottom:4px solid rgba(0,0,0,.28)}
-.hd h1{position:relative;-webkit-text-stroke:1.2px #fff;font-size:54px;font-weight:400;letter-spacing:.04em;line-height:1;text-shadow:4px 4px 0 #1a1208}
+.hd h1{position:relative;font-size:54px;font-weight:400;letter-spacing:.04em;line-height:1;text-shadow:4px 4px 0 #1a1208}
 .hd p{position:relative;font-size:28px;color:#ffe680;line-height:1.2;text-shadow:3px 3px 0 #1a1208}
 .v .hd{height:168px;flex-direction:column;align-items:flex-start;justify-content:center;gap:12px;padding-top:26px}
 .v .hd h1{font-size:64px}
@@ -64,8 +64,30 @@ body.transparent,html.transparent{background:transparent}
 .v .s{font-size:23px;margin-top:10px}
 .v .tag{font-size:25px}
 
+/* フォローおみくじ: 金ブロック縁の目立つバナー */
+.om{position:relative;display:flex;align-items:center;gap:30px;margin:0 0 18px;padding:18px 30px;border:6px solid #0c0c0e;
+  outline:6px solid #f2c230;outline-offset:-12px;
+  box-shadow:inset 6px 6px 0 rgba(255,255,255,.2),inset -6px -6px 0 rgba(0,0,0,.4),0 0 32px rgba(255,210,60,.45)}
+.om .oh{flex:0 0 auto;display:flex;flex-direction:column;gap:8px}
+.om .oh b{font-size:54px;line-height:1;color:#ffe14d;text-shadow:4px 4px 0 #3a2400;white-space:nowrap}
+.om .oh span{font-size:26px;color:#fff;text-shadow:3px 3px 0 #1b1b1d;white-space:nowrap}
+.om .ol{flex:1;display:flex;justify-content:space-between;gap:12px}
+.ok{display:flex;flex-direction:column;align-items:center;gap:8px}
+.ok .fn{font-size:34px;line-height:1;text-shadow:3px 3px 0 #1b1b1d}
+.ok .slot{position:relative;width:88px;height:88px}
+.ok .slot img{width:58px;height:58px}
+.ok .slot .cnt{font-size:30px}
+.ok .no{font-size:30px;color:#9aa0aa}
+.v .om{flex-direction:column;align-items:stretch;gap:18px;padding:24px 30px 26px}
+.v .om .oh{align-items:center}
+.v .om .oh b{font-size:64px}
+.v .om .ol{justify-content:space-around}
+.v .ok .slot{width:104px;height:104px}
+.v .ok .slot img{width:68px;height:68px}
+.v .ok .fn{font-size:40px}
+
 /* フッター: 木の看板風 */
-.ft{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.ft{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
 .v .ft{grid-template-columns:1fr;gap:12px}
 .f{display:flex;align-items:center;gap:14px;height:72px;padding:0 20px;background-size:64px 64px;border:4px solid #0c0c0e;
   box-shadow:inset 4px 4px 0 rgba(255,255,255,.2),inset -4px -4px 0 rgba(0,0,0,.38);
@@ -118,6 +140,19 @@ body.transparent,html.transparent{background:transparent}
     return c.toDataURL();
   }
   var S = {
+    iron: sprite([
+      "............",
+      "............",
+      "....kkkkkk..",
+      "...kwwwwllk.",
+      "..kwllllllk.",
+      ".kwllllllgk.",
+      "kwllllllggk.",
+      "klllllllgk..",
+      "kggggggggk..",
+      ".kkkkkkkk...",
+      "............",
+      "............"], {k: "#2b2b2b", w: "#ffffff", l: "#d8d8d8", g: "#9a9a9a"}),
     steak: sprite([
       "..kkkkk.....",
       ".kbbbbbkk...",
@@ -350,7 +385,6 @@ body.transparent,html.transparent{background:transparent}
   ];
   var FOOT = [
     ["like", "いいね100ごと", "xp", "全員に経験値"],
-    ["", "フォロー", "spark", "おみくじ 鉄やステーキ"],
     ["", "ギフト100こごと", "apple", "全員に金のリンゴ"]
   ];
 
@@ -390,6 +424,27 @@ body.transparent,html.transparent{background:transparent}
     g.appendChild(card);
   });
   stage.appendChild(g);
+
+  // フォローおみくじ
+  var OMI = [["大吉", "#ffd23f", "iron", "3"], ["中吉", "#ffe680", "iron", "1"], ["吉", "#7ee36b", "steak", "3"],
+             ["小吉", "#7fd8ff", "steak", "1"], ["凶", "#aab0ba", "", ""]];
+  var om = el("div", "om");
+  om.style.backgroundImage = TEX.wood;
+  var oh = el("div", "oh");
+  oh.appendChild(el("b", "", "フォローでおみくじ！"));
+  oh.appendChild(el("span", "", "フォローするたび 全員にプレゼント"));
+  om.appendChild(oh);
+  var ol = el("div", "ol");
+  OMI.forEach(function (o) {
+    var k = el("div", "ok");
+    var fn = el("div", "fn", o[0]); fn.style.color = o[1]; k.appendChild(fn);
+    var sl = el("div", "slot");
+    if (o[2]) { sl.appendChild(img(S[o[2]])); sl.appendChild(el("span", "cnt", o[3])); }
+    else sl.appendChild(el("span", "no", "なし"));
+    k.appendChild(sl); ol.appendChild(k);
+  });
+  om.appendChild(ol);
+  stage.appendChild(om);
 
   var ft = el("div", "ft");
   FOOT.forEach(function (f) {
