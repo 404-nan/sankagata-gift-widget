@@ -1,0 +1,417 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<title>参加型マイクラ ギフト一覧</title>
+<!--
+  ブラウザソース用ウィジェット（TikTok LIVE Studio / OBS）
+    index.html                     … 画面の縦横から自動でレイアウトを選ぶ
+    index.html?layout=horizontal   … 横 (基準 1920x1080)
+    index.html?layout=vertical     … 縦 (基準 1080x1920)
+    &transparent=1                 … 背景を透過（カードだけ表示）
+  ブロックの模様とアイテムの絵は、このファイル内のスクリプトで描いた自作ドット絵。
+  ギフトの絵は gifts/ の本物のTikTokギフト画像。フォントは fonts/DotGothic16 (SIL OFL)。
+-->
+<style>
+@font-face{font-family:Dot;src:url('fonts/DotGothic16.ttf') format('truetype');font-display:block}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:100%;height:100%;overflow:hidden;background:#15171c}
+body.transparent,html.transparent{background:transparent}
+#stage{position:absolute;left:0;top:0;transform-origin:0 0;display:flex;flex-direction:column;
+  font-family:Dot,'DotGothic16','Noto Sans CJK JP','Yu Gothic','Meiryo',sans-serif;color:#fff;
+  image-rendering:pixelated;padding:36px 40px 32px}
+#stage.h{width:1920px;height:1080px}
+#stage.v{width:1080px;height:1920px;padding:40px 36px 36px}
+#stage.bg{background-color:#1b1d23;background-size:96px 96px}
+
+/* 見出し: 草ブロック風の看板 */
+.hd{position:relative;display:flex;align-items:center;gap:26px;height:112px;padding:22px 30px 0;
+  background-size:64px 64px;border:4px solid #0c0c0e;
+  box-shadow:inset 4px 4px 0 rgba(255,255,255,.16),inset -4px -4px 0 rgba(0,0,0,.4)}
+.hd::before{content:"";position:absolute;left:0;right:0;top:0;height:24px;background-size:64px 24px;
+  background-image:var(--grass);border-bottom:4px solid rgba(0,0,0,.28)}
+.hd h1{position:relative;-webkit-text-stroke:1.2px #fff;font-size:54px;font-weight:400;letter-spacing:.04em;line-height:1;text-shadow:4px 4px 0 #1a1208}
+.hd p{position:relative;font-size:28px;color:#ffe680;line-height:1.2;text-shadow:3px 3px 0 #1a1208}
+.v .hd{height:168px;flex-direction:column;align-items:flex-start;justify-content:center;gap:12px;padding-top:26px}
+.v .hd h1{font-size:64px}
+.v .hd p{font-size:30px}
+
+/* カード: 石ブロック風 */
+.g{flex:1;min-height:0;display:grid;gap:16px;margin:18px 0;grid-template-columns:repeat(6,1fr);grid-auto-rows:minmax(0,1fr)}
+.v .g{grid-template-columns:repeat(3,1fr);gap:16px;margin:20px 0}
+.c{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;min-width:0;
+  background-size:64px 64px;border:4px solid #0c0c0e;
+  box-shadow:inset 5px 5px 0 rgba(255,255,255,.17),inset -5px -5px 0 rgba(0,0,0,.42)}
+/* 「ギフト → 起きること」をクラフト風に並べる */
+.r{display:flex;align-items:center;justify-content:center;gap:7px}
+.slot{display:flex;align-items:center;justify-content:center;background:#23252b;
+  box-shadow:inset 4px 4px 0 #101114,inset -4px -4px 0 #5d6068}
+.slot.gift{width:140px;height:140px}
+.slot.gift img{width:124px;height:124px;object-fit:contain;image-rendering:auto}
+.slot.out{position:relative;width:76px;height:76px}
+.slot.out img{width:48px;height:48px}
+.cnt{position:absolute;right:9px;bottom:5px;font-size:28px;-webkit-text-stroke:.7px #fff;line-height:1.1;text-shadow:3px 3px 0 #2a2a2a}
+.arw{width:24px;height:24px}
+.t{margin-top:18px;font-size:28px;-webkit-text-stroke:.7px #fff;line-height:1.15;white-space:nowrap;text-shadow:3px 3px 0 #1b1b1d;letter-spacing:.01em}
+.s{margin-top:9px;font-size:21px;line-height:1.15;white-space:nowrap;color:#ffe680;text-shadow:2px 2px 0 #1b1b1d;min-height:24px}
+.tag{position:absolute;top:-4px;left:-4px;background:#d93a2b;border:4px solid #0c0c0e;padding:4px 12px 6px;font-size:23px;line-height:1;
+  box-shadow:inset 3px 3px 0 rgba(255,255,255,.28),inset -3px -3px 0 rgba(0,0,0,.3);text-shadow:2px 2px 0 #5c130c}
+.v .slot.gift{width:158px;height:158px}
+.v .slot.gift img{width:140px;height:140px}
+.v .slot.out{width:86px;height:86px}
+.v .slot.out img{width:56px;height:56px}
+.v .t{font-size:31px;margin-top:20px}
+.v .s{font-size:23px;margin-top:10px}
+.v .tag{font-size:25px}
+
+/* フッター: 木の看板風 */
+.ft{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.v .ft{grid-template-columns:1fr;gap:12px}
+.f{display:flex;align-items:center;gap:14px;height:72px;padding:0 20px;background-size:64px 64px;border:4px solid #0c0c0e;
+  box-shadow:inset 4px 4px 0 rgba(255,255,255,.2),inset -4px -4px 0 rgba(0,0,0,.38);
+  font-size:26px;white-space:nowrap;text-shadow:3px 3px 0 #2a1a0a}
+.f img{width:40px;height:40px}
+.f .k{color:#ffe680}
+.f .a{width:22px;height:22px}
+.v .f{height:76px;font-size:30px;padding:0 24px}
+</style>
+</head>
+<body>
+<div id="stage"></div>
+<script>
+(function () {
+  "use strict";
+  var q = new URLSearchParams(location.search);
+  var transparent = /^(1|true|yes)$/i.test(q.get("transparent") || "");
+  var layout = (q.get("layout") || "").toLowerCase();
+  if (layout !== "vertical" && layout !== "horizontal") {
+    layout = innerHeight > innerWidth ? "vertical" : "horizontal";
+  }
+  var vertical = layout === "vertical";
+  var BW = vertical ? 1080 : 1920, BH = vertical ? 1920 : 1080;
+
+  // ---------- 自作ドット絵 ----------
+  function rng(seed) {
+    return function () { seed = (seed * 1664525 + 1013904223) >>> 0; return seed / 4294967296; };
+  }
+  // 16x16のざらざら模様（ブロックの面）。色のリストからランダムに点を打つだけ。
+  function block(colors, seed, w, h) {
+    w = w || 16; h = h || 16;
+    var c = document.createElement("canvas"); c.width = w; c.height = h;
+    var x = c.getContext("2d"), r = rng(seed);
+    for (var j = 0; j < h; j++) for (var i = 0; i < w; i++) {
+      x.fillStyle = colors[Math.floor(Math.pow(r(), 1.6) * colors.length)];
+      x.fillRect(i, j, 1, 1);
+    }
+    return "url(" + c.toDataURL() + ")";
+  }
+  // 文字で描いたドット絵 → 画像
+  function sprite(rows, pal) {
+    var c = document.createElement("canvas"); c.width = rows[0].length; c.height = rows.length;
+    var x = c.getContext("2d");
+    rows.forEach(function (row, j) {
+      for (var i = 0; i < row.length; i++) {
+        var p = pal[row[i]];
+        if (p) { x.fillStyle = p; x.fillRect(i, j, 1, 1); }
+      }
+    });
+    return c.toDataURL();
+  }
+  var S = {
+    steak: sprite([
+      "..kkkkk.....",
+      ".kbbbbbkk...",
+      "kbbllbbbbk..",
+      "kblbbbbbbbk.",
+      "kbbbbbllbbk.",
+      "kbbbblbbbbk.",
+      ".kbbbbbbbbk.",
+      "..kkbbbbbkk.",
+      "....kkkkwwk.",
+      ".......kwwwk",
+      "........kwwk",
+      ".........kk."], {k: "#3d1c0d", b: "#a8532a", l: "#d98a4e", w: "#f3e6cc"}),
+    cookie: sprite([
+      "...kkkkkk...",
+      ".kkcccccckk.",
+      ".kccdccccck.",
+      "kccccccdccck",
+      "kcdcccccccck",
+      "kccccdcccdck",
+      "kccccccccccs",
+      "kcdccccdccss",
+      ".kccccccccs.",
+      ".kkccdccsss.",
+      "...ksssss...",
+      "............"], {k: "#5b3515", c: "#dba75c", d: "#5b3515", s: "#a8742f"}),
+    xp: sprite([
+      "............",
+      "....kkkk....",
+      "..kkgggglk..",
+      "..kgyyyggk..",
+      ".kgywyygggk.",
+      ".kgyyygggdk.",
+      ".kggggggddk.",
+      ".kgggggdddk.",
+      "..kggdddkk..",
+      "..kkdddkk...",
+      "....kkkk....",
+      "............"], {k: "#1f4a12", g: "#7fe03a", y: "#e9ff73", w: "#ffffff", d: "#3f9a22", l: "#b9f25a"}),
+    dash: sprite([
+      "............",
+      "w....ww.....",
+      ".w....www...",
+      "..w....wwww.",
+      "www.wwwwwwww",
+      "..w....wwww.",
+      ".w....www...",
+      "w....ww.....",
+      "............",
+      "..bb..bb..b.",
+      "............",
+      "............"], {w: "#ffffff", b: "#8fd8ff"}),
+    heart: sprite([
+      "............",
+      "..kk....kk..",
+      ".krrk..krrk.",
+      "krwrrkkrrrrk",
+      "krwrrrrrrrrk",
+      "krrrrrrrrrdk",
+      ".krrrrrrrdk.",
+      "..krrrrrdk..",
+      "...krrrdk...",
+      "....krdk....",
+      ".....kk.....",
+      "............"], {k: "#4d0b12", r: "#f03b4b", w: "#ffc2c8", d: "#b01f33"}),
+    jump: sprite([
+      ".....ww.....",
+      "....wwww....",
+      "...wwwwww...",
+      "..wwwwwwww..",
+      ".wwwwwwwwww.",
+      "....wwww....",
+      "....wwww....",
+      "....wwww....",
+      "............",
+      "..cc....cc..",
+      ".cccc..cccc.",
+      "............"], {w: "#ffffff", c: "#bfe9ff"}),
+    eye: sprite([
+      "............",
+      "............",
+      "...kkkkkk...",
+      ".kkwwbbwwkk.",
+      "kwwwbccbwwwk",
+      "kwwwbckbwwwk",
+      "kwwwbccbwwwk",
+      ".kkwwbbwwkk.",
+      "...kkkkkk...",
+      "............",
+      "............",
+      "............"], {k: "#101114", w: "#ffffff", b: "#2a8fd6", c: "#7fe0ff"}),
+    petal: sprite([
+      "............",
+      "....pp......",
+      "...pwpp.....",
+      "...pppp..pp.",
+      "....pp..pwpp",
+      ".pp.....pppp",
+      "pwpp.....pp.",
+      "pppp........",
+      ".pp...pp....",
+      ".....pwpp...",
+      ".....pppp...",
+      "......pp...."], {p: "#ff9ec4", w: "#ffe1ee"}),
+    spark: sprite([
+      ".....y......",
+      ".p...y...c..",
+      "..p..y..c...",
+      "...p.w.c....",
+      "....www.....",
+      "yyywwwwwyyy.",
+      "....www.....",
+      "...c.w.p....",
+      "..c..y..p...",
+      ".c...y...p..",
+      ".....y......",
+      "............"], {y: "#ffe45c", p: "#ff7eb6", c: "#7ee0ff", w: "#ffffff"}),
+    paw: sprite([
+      "............",
+      "...kk..kk...",
+      "..kook.kook.",
+      "..kook.kook.",
+      ".k.kk...kk.k",
+      "kok.kkkk.kok",
+      "kok.koook.ok",
+      ".k.kooooook.",
+      "...koooooook",
+      "...koooooook",
+      "....kkkkkkk.",
+      "............"], {k: "#4a2c12", o: "#f1b96a"}),
+    emerald: sprite([
+      "....kkkk....",
+      "...kgllgk...",
+      "..kgglwggk..",
+      ".kgggllgggk.",
+      ".kggglggggk.",
+      ".kgggggggdk.",
+      ".kggggggddk.",
+      ".kgggggdddk.",
+      "..kgggdddk..",
+      "...kgdddk...",
+      "....kkkk....",
+      "............"], {k: "#0b3d1c", g: "#27c45a", l: "#8ff5b0", w: "#ffffff", d: "#14853a"}),
+    diamond: sprite([
+      "............",
+      "...kkkkkk...",
+      "..kcwwcccdk.",
+      ".kcwcccccddk",
+      "kcccccccdddk",
+      ".kccccccddk.",
+      "..kccccddk..",
+      "...kcccdk...",
+      "....kcdk....",
+      ".....kk.....",
+      "............",
+      "............"], {k: "#0c3b45", c: "#5ce6e0", w: "#e6fffd", d: "#27a7b0"}),
+    apple: sprite([
+      "......kk....",
+      ".....kbkgg..",
+      "..kkkkbkkgk.",
+      ".kyyykkyyyk.",
+      "kywwyyyyyyyk",
+      "kywyyyyyyyok",
+      "kyyyyyyyyyok",
+      "kyyyyyyyyook",
+      ".kyyyyyyook.",
+      ".kyyyyyoook.",
+      "..kkyookkk..",
+      "....kkk....."], {k: "#5a3a06", y: "#ffd83d", w: "#fff7c2", o: "#e0a21a", b: "#6b4a1e", g: "#4caf3a"}),
+    bread: sprite([
+      "............",
+      "............",
+      "..kkkkkkkk..",
+      ".kllllllllk.",
+      "kllbllbllblk",
+      "klbblbblbbbk",
+      "kbbbbbbbbbbk",
+      "kbbbbbbbbbdk",
+      ".kbbbbbbddk.",
+      "..kkkkkkkk..",
+      "............",
+      "............"], {k: "#4a2c0e", l: "#e3b061", b: "#c08a3c", d: "#93621f"}),
+    like: sprite([
+      "............",
+      "..kk....kk..",
+      ".kppk..kppk.",
+      "kpwppkkppppk",
+      "kpwppppppppk",
+      "kpppppppppdk",
+      ".kpppppppdk.",
+      "..kpppppdk..",
+      "...kpppdk...",
+      "....kpdk....",
+      ".....kk.....",
+      "............"], {k: "#4d0b2c", p: "#ff5fa2", w: "#ffd0e4", d: "#c22a6b"}),
+    arrow: sprite([
+      "....k...",
+      "....kk..",
+      "kkkkkwk.",
+      "kwwwwwwk",
+      "kwwwwwwk",
+      "kkkkkwk.",
+      "....kk..",
+      "....k..."], {k: "#101114", w: "#ffffff"})
+  };
+
+  var TEX = {
+    stone: block(["#3b3e45", "#3b3e45", "#41444c", "#373a41", "#484b53", "#33363c"], 7),
+    dirt: block(["#6b4a2e", "#6b4a2e", "#735133", "#5f4128", "#7e5a3a", "#553a23"], 11),
+    grass: block(["#5aa53a", "#5aa53a", "#66b544", "#4f9632", "#73c24e", "#468a2c"], 23, 16, 6),
+    wood: block(["#8a6236", "#8a6236", "#93693b", "#80592f", "#9b7142", "#765029"], 31),
+    night: block(["#1b1d23", "#1b1d23", "#1e2027", "#191b20", "#21232b"], 5)
+  };
+
+  // ---------- 中身 ----------
+  // [ギフト画像, 起きること(ドット絵), 個数, 1行目, 2行目, タグ]
+  var CARDS = [
+    ["rose", "petal", "", "花びらシャワー", "みんなにふってくる"],
+    ["tiktok", "cookie", "", "全員にクッキー", "おやつをどうぞ"],
+    ["gg", "xp", "", "全員に経験値", "レベルが上がる"],
+    ["icecream", "dash", "", "全員ダッシュ", "8秒 足が速くなる"],
+    ["heartme", "steak", "5", "全員にステーキ5こ", "ハートミーは大もり", "おトク！"],
+    ["fingerheart", "heart", "", "全員かいふく", "10秒 じわじわ回復"],
+    ["rosa", "jump", "", "全員 大ジャンプ", "20秒 落ちても安全"],
+    ["perfume", "eye", "", "暗やみが見える", "全員 60秒"],
+    ["confetti", "spark", "", "花火大会", "空いっぱいに上がる"],
+    ["corgi", "paw", "6", "わんこ6ぴき", "＋全員60秒むてき"],
+    ["moneygun", "emerald", "8", "エメラルド8こ", "＋金リンゴ2こ 全員に"],
+    ["galaxy", "diamond", "5", "全員にダイヤ5こ", "＋スーパーモード60秒"]
+  ];
+  var FOOT = [
+    ["like", "いいね100ごと", "xp", "全員に経験値"],
+    ["", "フォロー", "bread", "全員にパン"],
+    ["", "ギフト100こごと", "apple", "全員に金のリンゴ"]
+  ];
+
+  function el(tag, cls, html) {
+    var e = document.createElement(tag);
+    if (cls) e.className = cls;
+    if (html != null) e.innerHTML = html;
+    return e;
+  }
+  function img(src, cls) { var i = el("img", cls); i.src = src; i.alt = ""; return i; }
+
+  var stage = document.getElementById("stage");
+  stage.className = (vertical ? "v" : "h") + (transparent ? "" : " bg");
+  if (transparent) { document.documentElement.classList.add("transparent"); document.body.classList.add("transparent"); }
+  else stage.style.backgroundImage = TEX.night;
+
+  var hd = el("div", "hd");
+  hd.style.backgroundImage = TEX.dirt;
+  hd.style.setProperty("--grass", TEX.grass);
+  hd.appendChild(el("h1", "", "ギフトで起きること"));
+  hd.appendChild(el("p", "", "ぜんぶ サーバーのみんなにとどくよ！"));
+  stage.appendChild(hd);
+
+  var g = el("div", "g");
+  CARDS.forEach(function (c) {
+    var card = el("div", "c");
+    card.style.backgroundImage = TEX.stone;
+    var r = el("div", "r");
+    var gift = el("div", "slot gift"); gift.appendChild(img("gifts/" + c[0] + ".png"));
+    var out = el("div", "slot out"); out.appendChild(img(S[c[1]]));
+    if (c[2]) out.appendChild(el("span", "cnt", c[2]));
+    r.appendChild(gift); r.appendChild(img(S.arrow, "arw")); r.appendChild(out);
+    card.appendChild(r);
+    card.appendChild(el("div", "t", c[3]));
+    card.appendChild(el("div", "s", c[4] || ""));
+    if (c[5]) card.appendChild(el("div", "tag", c[5]));
+    g.appendChild(card);
+  });
+  stage.appendChild(g);
+
+  var ft = el("div", "ft");
+  FOOT.forEach(function (f) {
+    var b = el("div", "f");
+    b.style.backgroundImage = TEX.wood;
+    if (f[0]) b.appendChild(img(S[f[0]]));
+    b.appendChild(el("span", "k", f[1]));
+    b.appendChild(img(S.arrow, "a"));
+    b.appendChild(img(S[f[2]]));
+    b.appendChild(el("span", "", f[3]));
+    ft.appendChild(b);
+  });
+  stage.appendChild(ft);
+
+  // ブラウザソースの大きさに合わせて全体を拡大縮小
+  function fit() {
+    var u = Math.min(innerWidth / BW, innerHeight / BH);
+    stage.style.transform = "translate(" + (innerWidth - BW * u) / 2 + "px," + (innerHeight - BH * u) / 2 + "px) scale(" + u + ")";
+  }
+  addEventListener("resize", fit);
+  fit();
+})();
+</script>
+</body>
+</html>
